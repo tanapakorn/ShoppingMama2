@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">ShoppingMama2</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment2">Hello blank fragment2</string>
+    <string name="main_text_btn1">New</string>
+    <string name="title_activity_create_list">CreateListActivity</string>
+    <string name="layout_list_price">Summary Price</string>
+    <string name="layout_list_date">dd/mm/yyyy</string>
+    <string name="createlist_text_btn1">Add</string>
+    <string name="dialog_layout_text1">Title</string>
+    <string name="dialog_layout_text2">Price</string>
+    <string name="custom_dialog_btn1">Drop</string>
+    <string name="custom_dialog_btn2">Pick</string>
+</resources>

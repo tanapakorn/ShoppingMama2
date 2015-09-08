@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingStart="10dp"
+    android:paddingLeft="10dp"
+    android:paddingEnd="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="20dp" >
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/monthImage"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@android:drawable/ic_input_add"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/layout_list_price"
+        android:textSize="@dimen/text_big"
+        android:gravity="center"
+        android:id="@+id/sumPriceText"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/monthImage"
+        android:layout_toEndOf="@+id/monthImage"
+        android:layout_above="@+id/dateText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/layout_list_date"
+        android:textSize="@dimen/text_normal"
+        android:id="@+id/dateText"
+        android:layout_alignBottom="@+id/monthImage"
+        android:layout_toRightOf="@+id/monthImage"
+        android:layout_toEndOf="@+id/monthImage" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="xx Listed"
+        android:textSize="@dimen/text_normal"
+        android:id="@+id/listCountText"
+        android:layout_alignTop="@+id/dateText"
+        android:layout_alignRight="@+id/sumPriceText"
+        android:layout_alignEnd="@+id/sumPriceText" />
+</RelativeLayout>
