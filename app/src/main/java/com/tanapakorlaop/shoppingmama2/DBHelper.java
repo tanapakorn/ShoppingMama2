@@ -4,11 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by tanapakor.laop on 4/9/2558.
@@ -28,24 +25,23 @@ public class DBHelper extends SQLiteOpenHelper {
                 "first_name TEXT, last_name TEXT, tel TEXT, email TEXT, description TEXT)";*/
 
         String CREATE_ALL_ITEMS_TABLE = String.format("CREATE TABLE %s ( %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "%s TEXT, %s TEXT, %s INTEGER)",
+            "%s TEXT, %s INTEGER, %s TEXT, %s TEXT, %s INTEGER)",
                 ItemsAll.TABLE,
                 ItemsAll.Column.ID,
+                ItemsAll.Column.TABLE_NAME,
+                "order_id",
                 ItemsAll.Column.ORDER_NAME,
                 ItemsAll.Column.ORDER_PRICE,
                 ItemsAll.Column.ORDER_IMAGE);
 
-        String CREATE_ALL_MONTH_TABLE = String.format("CREATE TABLE %s ( %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "%s TEXT,%s TEXT,%s TEXT,%s TEXT,%s INTEGER)",
-                "all_month",
-                "_id",
-                "month",
-                "date",
-                "price",
-                "listed",
-                "image");
+        String CREATE_ORDERS_TABLE = String.format("CREATE TABLE orders ( %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "%s TEXT, %s TEXT)",
+                "order_id",
+                "name",
+                "price");
+
         db.execSQL(CREATE_ALL_ITEMS_TABLE);
-        db.execSQL(CREATE_ALL_MONTH_TABLE);
+        db.execSQL(CREATE_ORDERS_TABLE);
     }
 
     @Override
@@ -54,27 +50,27 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(DROP_ALL_ITEMS_TABLE);
         onCreate(db);
     }
-    public ArrayList<SaveMonth> getMonthList(){
-        SaveMonth saveMonths;
-        ArrayList<SaveMonth> newList = new ArrayList<>();
-        newList.add(new SaveMonth("Create New List", "dd/mm/yyyy", " 0 Listed", android.R.drawable.ic_input_add));
-
+    public ArrayList<ShoppingMamaDB> getAllData(){
+        ShoppingMamaDB saveMonths;
+        ArrayList<ShoppingMamaDB> newList = new ArrayList<>();
+        //newList.add(new ShoppingMamaDB("Create New List"));
 
         sqLiteDatabase = this.getWritableDatabase();
-        String sql = "SELECT * FROM `all_month`  ORDER BY `_id` ASC;";
 
-        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        String sql = "SELECT * FROM all_items" ;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
         if (cursor != null) {
             cursor.moveToFirst();
         }
         while (!cursor.isAfterLast()) {
-            saveMonths = new SaveMonth(
+            saveMonths = new ShoppingMamaDB(
                     cursor.getString(1),
-                    cursor.getString(2),
-                    cursor.getString(4),
-                    android.R.drawable.ic_input_add);
+                    cursor.getString(2));
+            saveMonths.setOrderPrice(cursor.getString(3));
             saveMonths.set_id(cursor.getInt(0));
-            saveMonths.setMonth(cursor.getString(1));
+            //saveMonths.set_id(cursor.getInt(1));
+            //saveMonths.setOrder_id(cursor.getInt(2));
             newList.add(0, saveMonths);
             cursor.moveToNext();
         }
@@ -82,26 +78,96 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return newList;
     }
-    public ArrayList<OrderDetail> getOrdersList(String table){
-        ArrayList<OrderDetail> newList = new ArrayList<>();
-        OrderDetail orderDetail;
+    /*public ArrayList<ShoppingMamaDB> getMonthList(){
+        ShoppingMamaDB saveMonths;
+        ArrayList<ShoppingMamaDB> newList = new ArrayList<>();
+        newList.add(new ShoppingMamaDB("Create New List"));
 
         sqLiteDatabase = this.getWritableDatabase();
-        String sql = "SELECT * FROM `"+table+"`  ORDER BY `_id` ASC;";
 
+        String sql = "SELECT distinct month FROM all_items" ;
 
-        newList.add(new OrderDetail("orderName","orderPrice",android.R.drawable.ic_input_add));
+        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        while (!cursor.isAfterLast()) {
+            saveMonths = new ShoppingMamaDB(
+                    cursor.getString(0));
+            //saveMonths.set_id(cursor.getInt(1));
+            //saveMonths.setOrder_id(cursor.getInt(2));
+            newList.add(0, saveMonths);
+            cursor.moveToNext();
+        }
+        sqLiteDatabase.close();
+
+        return newList;
+    }*/
+    public ArrayList<ShoppingMamaDB> getMonthList(){
+        ShoppingMamaDB saveMonths;
+        int sumPrice = 0;
+        int listed = 0;
+        ArrayList<String> tableList = new ArrayList<>();
+        ArrayList<ShoppingMamaDB> newList = new ArrayList<>();
+        newList.add(new ShoppingMamaDB("Create New List"));
+
+        sqLiteDatabase = this.getWritableDatabase();
+
+        String sql = "SELECT distinct month FROM all_items" ;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        while (!cursor.isAfterLast()) {
+            tableList.add(0,cursor.getString(0));
+            cursor.moveToNext();
+        }
+        for(int i = 0; i < tableList.size() ; i++){
+            String sql2 = "SELECT price FROM all_items WHERE month = \""+tableList.get(i)+"\"" ;
+            listed = 0;
+            sumPrice = 0;
+            cursor = sqLiteDatabase.rawQuery(sql2,null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+            }
+            while (!cursor.isAfterLast()) {
+                sumPrice += Integer.parseInt(cursor.getString(0));
+                listed++;
+                cursor.moveToNext();
+            }
+            saveMonths = new ShoppingMamaDB(tableList.get(i));
+            saveMonths.setSumPrice(String.valueOf(sumPrice));
+            saveMonths.setListed(String.valueOf(listed));
+            newList.add(0,saveMonths);
+        }
+        sqLiteDatabase.close();
+
+        return newList;
+    }
+    public ArrayList<ShoppingMamaDB> getOrdersList(String table){
+        ArrayList<ShoppingMamaDB> newList = new ArrayList<>();
+        ShoppingMamaDB orderDetail;
+
+        //ArrayList<ShoppingMamaDB> monthsList = new ArrayList<>();
+        ArrayList<Integer> order_id = new ArrayList<>();
+        sqLiteDatabase = this.getWritableDatabase();
+       // String sql = "SELECT * FROM all_month WHERE `"+table+"`  ORDER BY `_id` ASC;";
+        String sql = "SELECT order_id,name,price FROM all_items WHERE month = \""+table+"\"";
+        //String sql2 = "SELECT * FROM all_items";
+
+        newList.add(new ShoppingMamaDB("orderName", "orderPrice"));
         Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
 
         if (cursor != null) {
             cursor.moveToFirst();
         }
         while(!cursor.isAfterLast()) {
-            orderDetail = new OrderDetail(
+            orderDetail = new ShoppingMamaDB(
                     cursor.getString(1),
-                    cursor.getString(2),
-                    android.R.drawable.ic_input_add
+                    cursor.getString(2)
             );
+            orderDetail.setOrder_id(cursor.getInt(0));
             newList.add(0, orderDetail);
             cursor.moveToNext();
         }
@@ -109,22 +175,68 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return newList;
     }
-
-    public void insertOrder(String name,String price){
+    public ArrayList<ShoppingMamaDB> getDialogList(){
+        ArrayList<ShoppingMamaDB> newList = new ArrayList<>();
+        ShoppingMamaDB newOrder;
         sqLiteDatabase = this.getWritableDatabase();
-        String sql = "INSERT  INTO `all_items`(`name`,`price`) VALUES ('"+
+
+        String sql = "SELECT * FROM orders";
+        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        while(!cursor.isAfterLast()) {
+            newOrder = new ShoppingMamaDB(
+                    cursor.getString(1),
+                    cursor.getString(2)
+            );
+            newOrder.set_id(cursor.getInt(0));
+            newList.add(0, newOrder);
+            cursor.moveToNext();
+        }
+        sqLiteDatabase.close();
+        return newList;
+    }
+    public void insertOrder(String month,int orderId,String name,String price){
+        sqLiteDatabase = this.getWritableDatabase();
+        String sql = "INSERT  INTO `all_items`(`month`,`order_id`,`name`,`price`) VALUES ('"+
+                month+"','"+
+                orderId+"','"+
                 name+"','"+
                 price+"');";
         sqLiteDatabase.execSQL(sql);
         sqLiteDatabase.close();
     }
-    public void deleteOrder(String name){
+    public void deleteOrder(String month,String name){
         sqLiteDatabase = this.getWritableDatabase();
-        String sql = "DELETE FROM all_items WHERE name = \""+name+"\";";
+        String sql = "DELETE FROM all_items WHERE name = \""+name+"\" AND month = \""+month+"\";";
         sqLiteDatabase.execSQL(sql);
         sqLiteDatabase.close();
     }
-    public void createNewTable(String month){
+    public void addNewOrder(String orderName,String orderPrice){
+        sqLiteDatabase = this.getWritableDatabase();
+        String sql = "INSERT INTO orders (name,price) VALUES (\""+orderName+"\",\""+orderPrice+"\");";
+        sqLiteDatabase.execSQL(sql);
+        sqLiteDatabase.close();
+    }
+    public Integer getNewOrderId(String orderName){
+        int order_id = 0;
+
+        sqLiteDatabase = this.getWritableDatabase();
+        String sql = "SELECT order_id FROM orders WHERE name = \""+orderName+"\"";
+
+        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        while (!cursor.isAfterLast()) {
+            order_id = cursor.getInt(0);
+            cursor.moveToNext();
+        }
+        sqLiteDatabase.close();
+        return order_id;
+    }
+    /*public void createNewTable(String month){
         sqLiteDatabase = this.getWritableDatabase();
         ArrayList<String> counter = new ArrayList<>();
         //String counter;
@@ -160,8 +272,8 @@ public class DBHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(CREATE_NEW_TABLE);
         }
         sqLiteDatabase.close();
-    }
-    public void insertNewMonth(String date,String month){
+    }*/
+    /*public void insertNewMonth(String date,String month){
         sqLiteDatabase = this.getWritableDatabase();
 
         String price = "0 baht";
@@ -171,6 +283,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 date+"','"+
                 price+"','"+
                 listed+"');";
+        sqLiteDatabase.execSQL(sql);
+        sqLiteDatabase.close();
+    }*/
+    public void insertNewMonth(String month,String date){
+        sqLiteDatabase = this.getWritableDatabase();
+        int order_id = 0;
+        String sql = "INSERT  INTO `all_month`(`month`,`order_id`) VALUES ('"+
+                month+"','"+
+                order_id+"');";
         sqLiteDatabase.execSQL(sql);
         sqLiteDatabase.close();
     }

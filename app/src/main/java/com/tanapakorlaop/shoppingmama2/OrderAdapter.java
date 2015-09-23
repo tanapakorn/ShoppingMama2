@@ -14,16 +14,16 @@ import java.util.ArrayList;
 /**
  * Created by tanapakor.laop on 31/8/2558.
  */
-public class OrderAdapter extends ArrayAdapter<OrderDetail> {
+public class OrderAdapter extends ArrayAdapter<ShoppingMamaDB> {
     private Context context;
     private int resource;
-    private ArrayList<OrderDetail> orderDetail = null;
+    private ArrayList<ShoppingMamaDB> orderDetail = null;
 
-    public OrderAdapter(Context context, int resource, ArrayList<OrderDetail> orderDetail) {
-        super(context, resource, orderDetail);
+    public OrderAdapter(Context context, int resource, ArrayList<ShoppingMamaDB> shoppingMamaDBs) {
+        super(context, resource, shoppingMamaDBs);
         this.context = context;
         this.resource = resource;
-        this.orderDetail = orderDetail;
+        this.orderDetail = shoppingMamaDBs;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class OrderAdapter extends ArrayAdapter<OrderDetail> {
         TextView orderPrice = (TextView)mOrders.findViewById(R.id.orderPrice);
         TextView orderName = (TextView)mOrders.findViewById(R.id.orderName);
 
-        OrderDetail orders = orderDetail.get(position);
+        ShoppingMamaDB orders = orderDetail.get(position);
         orderPrice.setText(orders.getOrderPrice());
         orderName.setText(orders.getOrderName());
 

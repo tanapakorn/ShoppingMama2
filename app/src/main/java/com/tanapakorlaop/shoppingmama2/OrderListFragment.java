@@ -62,12 +62,12 @@ public class OrderListFragment extends ListFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        orders = ((CreateListActivity)getActivity()).getOrders();
+        //orders = ((CreateListActivity)getActivity()).getOrders();
         /*orders.add(new OrderDetail("orderPrice","orderName",android.R.drawable.ic_input_add));
         orders.add(0,new OrderDetail("22222","222222",android.R.drawable.ic_input_add));
         orders.add(0,new OrderDetail("23332","233332",android.R.drawable.ic_input_add));*/
         // TODO: Change Adapter to display your content
-        orderAdapter = new OrderAdapter(getActivity(), R.layout.order_list_layout, orders);
+        orderAdapter = new OrderAdapter(getActivity(), R.layout.order_list_layout, ((CreateListActivity)getActivity()).orders);
         setListAdapter(orderAdapter);
     }
 
@@ -96,7 +96,7 @@ public class OrderListFragment extends ListFragment {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-            if(position == orders.size()-1){
+            if(position == ((CreateListActivity)getActivity()).orders.size()-1){
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("New Order");
                 builder.setMessage("Do you want to create a New Order?");
@@ -109,20 +109,20 @@ public class OrderListFragment extends ListFragment {
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((MainActivity)getActivity()).createNewList();
+                        ((CreateListActivity)getActivity()).makeDialog();
                     }
                 }).show();
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                final String name = orders.get(position).getOrderName();
-                final String price = orders.get(position).getOrderPrice();
+                final String name = ((CreateListActivity)getActivity()).orders.get(position).getOrderName();
+                final String price = ((CreateListActivity)getActivity()).orders.get(position).getOrderPrice();
                 builder.setTitle(name);
                 builder.setMessage(price + " Price");
                 builder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((CreateListActivity)getActivity()).removeOrders(name);
-                        orders.remove(position);
+                        ((CreateListActivity) getActivity()).removeOrders(((CreateListActivity) getActivity()).table, name);
+                        ((CreateListActivity) getActivity()).orders.remove(position);
                     }
                 });
                 builder.setNegativeButton("Edit", new DialogInterface.OnClickListener() {

@@ -12,6 +12,7 @@ public class ItemsAll {
 
     public class Column {
         public static final String ID = BaseColumns._ID;
+        public static final String TABLE_NAME = "month";
         public static final String ORDER_NAME = "name";
         public static final String ORDER_PRICE = "price";
         public static final String ORDER_IMAGE = "image";

@@ -4,14 +4,14 @@ package com.tanapakorlaop.shoppingmama2;
  * Created by tanapakor.laop on 31/8/2558.
  */
 public class OrderDetail {
-
-    private String orderPrice;
-    private String orderName;
-    private int orderPic;
     private int _id;
+    private String orderName;
+    private String orderPrice;
+    private int orderPic;
+
     public OrderDetail(String orderName,String orderPrice, int orderPic) {
-        this.orderPrice = orderPrice;
         this.orderName = orderName;
+        this.orderPrice = orderPrice;
         this.orderPic = orderPic;
     }
     public String getOrderPrice() {

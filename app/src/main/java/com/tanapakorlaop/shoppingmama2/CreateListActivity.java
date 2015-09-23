@@ -1,33 +1,27 @@
 package com.tanapakorlaop.shoppingmama2;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ListView;
-
-import com.tanapakorlaop.shoppingmama2.dummy.DummyContent;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 public class CreateListActivity extends FragmentActivity implements MainFragment.OnFragmentInteractionListener
         ,OrderListFragment.OnFragmentInteractionListener{
 
-    private ArrayList<OrderDetail> orders = new ArrayList<>();
+    public  ArrayList<ShoppingMamaDB> monthly = new ArrayList<>();
+
+    ArrayList<ShoppingMamaDB> orders = new ArrayList<>();
+    private ArrayList<OrderDetail> dialogOrders = new ArrayList<>();
     FrameLayout frameLayout;
     OrderListFragment orderListFragment;
     DBHelper mHelper;
@@ -41,7 +35,6 @@ public class CreateListActivity extends FragmentActivity implements MainFragment
         table = i.getStringExtra("table");
         mHelper = new DBHelper(this,ItemsAll.DB_NAME,null,ItemsAll.DB_VERSION);
 
-        final MyDialog myDialog = new MyDialog();
         pullOrders();
 
         frameLayout = (FrameLayout)findViewById(R.id.frame_layout);
@@ -49,7 +42,7 @@ public class CreateListActivity extends FragmentActivity implements MainFragment
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myDialog.show(getSupportFragmentManager(),"MyList");
+                makeDialog();
             }
         });
 
@@ -62,18 +55,41 @@ public class CreateListActivity extends FragmentActivity implements MainFragment
 
     private void pullOrders(){
         orders = mHelper.getOrdersList(table);
+        for(int i = 0 ; i<orders.size()-1 ; i++){
+            Log.i("aaa", String.valueOf(orders.get(i).getOrder_id())+" name = " +String.valueOf(orders.get(i).getOrderName()));
+        }
     }
-    public ArrayList<OrderDetail> getOrders() {
+    public ArrayList<ShoppingMamaDB> getOrders() {
         return orders;
     }
-    public void addOrders(OrderDetail newOrder) {
+    public ArrayList<OrderDetail> getDialogOrders() {
+        return dialogOrders;
+    }
+    /*public void addOrders(OrderDetail newOrder) {
         orders.add(0, newOrder);
         orderListFragment.orderAdapter.notifyDataSetChanged();
         mHelper.insertOrder(newOrder.getOrderName(),newOrder.getOrderPrice());
-    }
-    public void removeOrders(String name) {
-        mHelper.deleteOrder(name);
+    }*/
+    public void addOrders(String month,ShoppingMamaDB newOrder) {
+        orders.add(0, newOrder);
         orderListFragment.orderAdapter.notifyDataSetChanged();
+        mHelper.insertOrder(month,newOrder.get_id(),newOrder.getOrderName(),newOrder.getOrderPrice());
+    }
+    public void removeOrders(String month,String name) {
+        mHelper.deleteOrder(month, name);
+        orderListFragment.orderAdapter.notifyDataSetChanged();
+    }
+    public void makeDialog(){
+        final MyDialog myDialog = new MyDialog();
+        myDialog.show(getSupportFragmentManager(),"MyList");
+    }
+
+    public ArrayList<ShoppingMamaDB> getMonthly() {
+        return monthly;
+    }
+
+    public void setMonthly(ArrayList<ShoppingMamaDB> monthly) {
+        this.monthly = monthly;
     }
 
     @Override

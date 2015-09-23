@@ -1,25 +1,15 @@
 package com.tanapakorlaop.shoppingmama2;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,7 +22,9 @@ public class MainActivity extends FragmentActivity implements MonthListFragment.
 
     private static final int CREATE_LIST = 0;
 
-    private ArrayList<SaveMonth> monthly = new ArrayList<>();
+    public ArrayList<ShoppingMamaDB> shoppingMamaDBs = new ArrayList<>();
+    public ArrayList<ShoppingMamaDB> monthly = new ArrayList<>();
+
     private String[] monthTable = {"january","february",
             "march", "april","may","june","july","august",
             "september","october","november","december"};
@@ -44,6 +36,7 @@ public class MainActivity extends FragmentActivity implements MonthListFragment.
         setContentView(R.layout.activity_main);
 
         mHelper = new DBHelper(this,ItemsAll.DB_NAME,null,ItemsAll.DB_VERSION);
+        //pullDB();
         pullMonthly();
         Button createBtn = (Button)findViewById(R.id.create_btn);
 
@@ -62,6 +55,9 @@ public class MainActivity extends FragmentActivity implements MonthListFragment.
         });
 
     }
+    public void pullDB(){
+        shoppingMamaDBs = mHelper.getAllData();
+    }
     public void pullMonthly(){
         monthly = mHelper.getMonthList();
     }
@@ -70,18 +66,25 @@ public class MainActivity extends FragmentActivity implements MonthListFragment.
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         DateFormat mmFormat = new SimpleDateFormat("MM");
         Date date = new Date();
-        String table = getCurrentMonth(mmFormat.format(date));
-        String month = table + String.valueOf(monthly.size());
+        String table = getCurrentDate(dateFormat.format(date));
+
+        if(!table.equals(monthly.get(0).getTableName())) {
+            ShoppingMamaDB newMonth = new ShoppingMamaDB(table);
+            monthly.add(0, newMonth);
+            monthListFragment.monthAdapter.notifyDataSetChanged();
+        }
+        //String table = getCurrentMonth(mmFormat.format(date));
+        //String month = table + String.valueOf(monthly.size());
         //String table = getCurrentMonth(mmFormat.format(date))+String.valueOf(monthly.size());
-        mHelper.createNewTable(table);
-        SaveMonth newMonth = new SaveMonth(month,dateFormat.format(date),"0 Listed",android.R.drawable.ic_input_add);
+        /*mHelper.createNewTable(table);
+        ShoppingMamaDB newMonth = new ShoppingMamaDB(month,dateFormat.format(date),"0 Listed",android.R.drawable.ic_input_add);
         newMonth.setMonth(month);
         monthly.add(0, newMonth);
         monthListFragment.monthAdapter.notifyDataSetChanged();
-        mHelper.insertNewMonth(dateFormat.format(date), month);
+        mHelper.insertNewMonth(dateFormat.format(date), month);*/
         //mHelper.insertNewMonth(dateFormat.format(date),table);
         //editList(table);
-        editList(month);
+        editList(table);
     }
     public void editList(String table){
 
@@ -90,7 +93,7 @@ public class MainActivity extends FragmentActivity implements MonthListFragment.
         intent.putExtra("table", table);
         startActivity(intent);
     }
-    public ArrayList<SaveMonth> getMonthly() {
+    public ArrayList<ShoppingMamaDB> getMonthly() {
         return monthly;
     }
     @Override
@@ -198,4 +201,5 @@ public class MainActivity extends FragmentActivity implements MonthListFragment.
                 return "unknown";
         }
     }
+
 }

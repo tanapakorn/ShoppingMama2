@@ -35,7 +35,7 @@ public class MonthListFragment extends ListFragment {
     private OnFragmentInteractionListener mListener;
 
 
-    private ArrayList<SaveMonth> monthly = new ArrayList<>();
+    //private ArrayList<ShoppingMamaDB> monthly = new ArrayList<>();
     MonthAdapter monthAdapter;
     // TODO: Rename and change types of parameters
     public static MonthListFragment newInstance(String param1, String param2) {
@@ -62,11 +62,11 @@ public class MonthListFragment extends ListFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        monthly = ((MainActivity)getActivity()).getMonthly();
-        //monthly.add(new SaveMonth("Create New List","dd/mm/yyyy"," 0 Listed",android.R.drawable.ic_input_add));
-        //monthly.add(0,new SaveMonth("222 22 2222","dd/mm/yyyy"," 1 Listed",android.R.drawable.ic_input_add));
+        //monthly = ((MainActivity)getActivity()).getMonthly();
+        //monthly.add(new ShoppingMamaDB("Create New List","dd/mm/yyyy"," 0 Listed",android.R.drawable.ic_input_add));
+        //monthly.add(0,new ShoppingMamaDB("222 22 2222","dd/mm/yyyy"," 1 Listed",android.R.drawable.ic_input_add));
         // TODO: Change Adapter to display your content
-        monthAdapter = new MonthAdapter(getActivity(), R.layout.save_list_layout, monthly);
+        monthAdapter = new MonthAdapter(getActivity(), R.layout.save_list_layout, ((MainActivity)getActivity()).monthly);
         setListAdapter(monthAdapter);
     }
 
@@ -96,8 +96,8 @@ public class MonthListFragment extends ListFragment {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-            monthly = ((MainActivity)getActivity()).getMonthly();
-            if(position == monthly.size()-1){
+            //monthly = ((MainActivity)getActivity()).getMonthly();
+            if(position == ((MainActivity)getActivity()).monthly.size()-1){
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("New List");
                 builder.setMessage("Do you want to create a New List?");
@@ -110,14 +110,13 @@ public class MonthListFragment extends ListFragment {
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        ((MainActivity)getActivity()).createNewList();
                     }
                 }).show();
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(((MainActivity)getActivity()).getCurrentDate(monthly.get(position).getDate()));
-                builder.setMessage(monthly.get(position).getSumPrice() + " Price\n"
-                        + monthly.get(position).getListed());
+                builder.setTitle(/*((MainActivity)getActivity()).getCurrentDate(monthly.get(position).getDate())*/"title");
+                builder.setMessage("message");
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -132,7 +131,7 @@ public class MonthListFragment extends ListFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                        // ((MainActivity)getActivity()).editList(table);
-                        String tableName = monthly.get(position).getMonth();
+                        String tableName = ((MainActivity)getActivity()).monthly.get(position).getTableName();
                        // String tableName = monthly.get(position).getMonth()+String.valueOf(monthly.get(position).get_id());
                         ((MainActivity)getActivity()).editList(tableName);
                         Toast.makeText(getActivity(),tableName,Toast.LENGTH_LONG).show();
